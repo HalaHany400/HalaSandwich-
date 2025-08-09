@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hala Sandwich</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #fffdea; /* كريمي فاتح */
+    color: #333;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+  header {
+    margin-top: 30px;
+    text-align: center;
+  }
+  header h1 {
+    font-size: 3rem;
+    color: #1e90ff; /* أزرق سماوي */
+    margin-bottom: 10px;
+    font-weight: 900;
+    letter-spacing: 2px;
+  }
+  .ingredients {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+    color: #2e8b57; /* أخضر نعناع */
+    font-weight: 600;
+  }
+  .sandwich-img {
+    width: 400px;  /* كبرت العرض */
+    border-radius: 20px;
+    box-shadow: 0 10px 20px rgba(30, 144, 255, 0.3);
+    margin-bottom: 40px;
+    transition: transform 0.3s ease;
+  }
+  .sandwich-img:hover {
+    transform: scale(1.05);
+  }
+
+  /* تعديل زر اطلب الآن */
+  button#orderBtn {
+    background-color: #4caf50; /* أخضر مبهج */
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 25px 100px;
+    font-size: 2.4rem;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(76, 175, 80, 0.6);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    margin: 50px 0;
+    display: inline-block;
+  }
+  button#orderBtn:hover {
+    background-color: #45a049;
+    transform: scale(1.05);
+  }
+
+  /* Modal styles */
+  .modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(30, 144, 255, 0.2);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 15px;
+  }
+  .modal.active {
+    display: flex;
+  }
+  .modal-content {
+    background: #fffdea;
+    border-radius: 20px;
+    padding: 35px 45px;
+    max-width: 450px;
+    width: 100%;
+    box-shadow: 0 0 25px rgba(46, 139, 87, 0.5);
+    direction: rtl;
+    text-align: right;
+    color: #2e8b57;
+  }
+  .modal-content h2 {
+    color: #1e90ff;
+    margin-bottom: 25px;
+    font-weight: 900;
+    font-size: 2rem;
+    letter-spacing: 1.5px;
+  }
+  .modal-content label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 700;
+    color: #2e8b57;
+    font-size: 1.1rem;
+  }
+  .modal-content input, .modal-content select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    border: 2px solid #1e90ff;
+    font-size: 1rem;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+  }
+  .modal-content input:invalid {
+    border-color: #d9534f;
+  }
+  .modal-content button {
+    background-color: #ffea00;
+    color: #1e3a8a;
+    border: none;
+    border-radius: 15px;
+    padding: 15px 0;
+    font-size: 1.3rem;
+    width: 100%;
+    cursor: pointer;
+    opacity: 0.75;
+    transition: opacity 0.3s ease;
+    font-weight: 700;
+    letter-spacing: 1.1px;
+  }
+  .modal-content button:enabled {
+    opacity: 1;
+  }
+  .modal-content button:hover:enabled {
+    background-color: #f7d600;
+  }
+  .close-btn {
+    background: transparent;
+    border: none;
+    font-size: 2rem;
+    float: left;
+    cursor: pointer;
+    color: #1e90ff;
+    margin-bottom: 25px;
+    font-weight: 900;
+    line-height: 1;
+    padding: 0;
+  }
+  .price-info {
+    font-weight: 900;
+    font-size: 1.4rem;
+    color: #1e3a8a;
+    margin-bottom: 25px;
+    text-align: center;
+    letter-spacing: 1.3px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Hala Sandwich</h1>
+  <p class="ingredients">مكونات الساندوتش: قطعة استربس - جبنة شيدر - كاتشب - مايونيز</p>
+  <img
+    src="https://www.thaqfny.com/wp-content/uploads/2020/12/for-web-4791-1.jpg"
+    alt="ساندوتش استربس"
+    class="sandwich-img"
+  />
+</header>
+
+<button id="orderBtn" aria-haspopup="dialog" aria-controls="orderModal">اطلب الآن</button>
+
+<!-- Modal -->
+<div class="modal" id="orderModal" aria-hidden="true" role="dialog" aria-labelledby="modalTitle" aria-modal="true">
+  <div class="modal-content">
+    <button class="close-btn" id="closeModal" aria-label="إغلاق">&times;</button>
+    <h2 id="modalTitle">اختر طريقة استلام الطلب</h2>
+
+    <select id="deliveryType" required aria-required="true" aria-describedby="priceInfo">
+      <option value="" disabled selected>اختر طريقة الاستلام</option>
+      <option value="pickup">هستلمه بنفسي من المكان</option>
+      <option value="delivery">التوصيل لمكانك (+5 جنيه)</option>
+    </select>
+
+    <form id="orderForm" style="display:none;" novalidate>
+      <label for="name">الاسم الكامل:</label>
+      <input type="text" id="name" name="name" required placeholder="اكتب اسمك" autocomplete="name" />
+
+      <label for="phone">رقم التليفون:</label>
+      <input type="tel" id="phone" name="phone" required placeholder="مثلاً 01012345678" pattern="[0-9]{10,15}" autocomplete="tel" />
+
+      <label for="quantity">عدد الساندوتشات:</label>
+      <input type="number" id="quantity" name="quantity" min="1" value="1" required />
+
+      <div id="locationSection" style="display:none;">
+        <label for="location">موقعك الحالي:</label>
+        <input type="text" id="location" name="location" readonly placeholder="اضغط زر الموقع لاختيار مكانك" aria-readonly="true" />
+        <button type="button" id="getLocation" style="background:#1e90ff; color:#fff; border:none; border-radius:10px; padding:10px 15px; cursor:pointer; margin-bottom:20px;">مشاركة الموقع</button>
+      </div>
+
+      <p class="price-info" id="priceInfo">سعر الساندوتش: 30 جنيه</p>
+
+      <button type="submit" disabled>ارسال الطلب</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  const orderBtn = document.getElementById('orderBtn');
+  const modal = document.getElementById('orderModal');
+  const closeModalBtn = document.getElementById('closeModal');
+  const deliveryTypeSelect = document.getElementById('deliveryType');
+  const orderForm = document.getElementById('orderForm');
+  const submitBtn = orderForm.querySelector('button[type="submit"]');
+  const locationInput = document.getElementById('location');
+  const getLocationBtn = document.getElementById('getLocation');
+  const locationSection = document.getElementById('locationSection');
+  const priceInfo = document.getElementById('priceInfo');
+  const quantityInput = document.getElementById('quantity');
+  const nameInput = document.getElementById('name');
+  const phoneInput = document.getElementById('phone');
+
+  const basePrice = 30;
+  const deliveryFee = 5;
+
+  orderBtn.addEventListener('click', () => {
+    modal.classList.add('active');
+    modal.setAttribute('aria-hidden', 'false');
+    deliveryTypeSelect.value = "";
+    orderForm.style.display = "none";
+    locationSection.style.display = "none";
+    submitBtn.disabled = true;
+    locationInput.value = "";
+    priceInfo.textContent = `سعر الساندوتش: ${basePrice} جنيه`;
+    quantityInput.value = 1;
+    clearInputs();
+  });
+
+  closeModalBtn.addEventListener('click', () => {
+    modal.classList.remove('active');
+    modal.setAttribute('aria-hidden', 'true');
+    clearInputs();
+  });
+
+  deliveryTypeSelect.addEventListener('change', () => {
+    orderForm.style.display = "block";
+    locationInput.value = "";
+    if (deliveryTypeSelect.value === "delivery") {
+      locationSection.style.display = "block";
+      priceInfo.textContent = `سعر الساندوتش: ${basePrice} جنيه + ${deliveryFee} جنيه توصيل`;
+    } else {
+      locationSection.style.display = "none";
+      priceInfo.textContent = `سعر الساندوتش: ${basePrice} جنيه`;
+    }
+    checkFormValidity();
+  });
+
+  getLocationBtn.addEventListener('click', () => {
+    if (!navigator.geolocation) {
+      alert('المتصفح لا يدعم خاصية الموقع.');
+      return;
+    }
+    getLocationBtn.textContent = "جاري الحصول على الموقع...";
+    getLocationBtn.disabled = true;
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        locationInput.value = `خط العرض: ${latitude.toFixed(5)}, خط الطول: ${longitude.toFixed(5)}`;
+        getLocationBtn.textContent = "تم الحصول على الموقع";
+        checkFormValidity();
+      },
+      () => {
+        alert('تعذر الحصول على الموقع، يرجى السماح بالوصول للموقع.');
+        getLocationBtn.textContent = "مشاركة الموقع";
+        getLocationBtn.disabled = false;
+      }
+    );
+  });
+
+  function checkFormValidity() {
+    const deliveryType = deliveryTypeSelect.value;
+    const nameValid = nameInput.checkValidity();
+    const phoneValid = phoneInput.checkValidity();
+    const quantityValid = quantityInput.checkValidity();
+    let locationValid = true;
+
+    if (deliveryType === "delivery") {
+      locationValid = locationInput.value.trim() !== "";
+    }
+
+    submitBtn.disabled = !(nameValid && phoneValid && quantityValid && locationValid);
+  }
+
+  [nameInput, phoneInput, quantityInput, locationInput].forEach(input => {
+    input.addEventListener('input', checkFormValidity);
+  });
+
+  orderForm.addEventListener('submit', e => {
+    e.preventDefault();
+
+    let totalPrice = basePrice * quantityInput.value;
+    if (deliveryTypeSelect.value === "delivery") {
+      totalPrice += deliveryFee * quantityInput.value;
+    }
+
+    alert(`شكراً لطلبك يا ${nameInput.value}!\nالعدد: ${quantityInput.value} ساندوتش\nالسعر الإجمالي: ${totalPrice} جنيه\nسيتم التواصل معك على الرقم: ${phoneInput.value}`);
+
+    modal.classList.remove('active');
+    modal.setAttribute('aria-hidden', 'true');
+    clearInputs();
+  });
+
+  function clearInputs() {
+    nameInput.value = "";
+    phoneInput.value = "";
+    quantityInput.value = 1;
+    locationInput.value = "";
+    deliveryTypeSelect.value = "";
+    submitBtn.disabled = true;
+    getLocationBtn.disabled = false;
+    getLocationBtn.textContent = "مشاركة الموقع";
+    orderForm.style.display = "none";
+    locationSection.style.display = "none";
+  }
+</script>
+
+</body>
+</html>
