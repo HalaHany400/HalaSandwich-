@@ -7,7 +7,7 @@
 <style>
   body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #fffdea; /* كريمي فاتح */
+    background: #fffdea;
     color: #333;
     margin: 0;
     padding: 0;
@@ -22,7 +22,7 @@
   }
   header h1 {
     font-size: 3rem;
-    color: #1e90ff; /* أزرق سماوي */
+    color: #1e90ff;
     margin-bottom: 10px;
     font-weight: 900;
     letter-spacing: 2px;
@@ -30,11 +30,11 @@
   .ingredients {
     font-size: 1.2rem;
     margin-bottom: 30px;
-    color: #2e8b57; /* أخضر نعناع */
+    color: #2e8b57;
     font-weight: 600;
   }
   .sandwich-img {
-    width: 400px;  /* كبرت العرض */
+    width: 400px;
     border-radius: 20px;
     box-shadow: 0 10px 20px rgba(30, 144, 255, 0.3);
     margin-bottom: 40px;
@@ -43,10 +43,8 @@
   .sandwich-img:hover {
     transform: scale(1.05);
   }
-
-  /* تعديل زر اطلب الآن */
   button#orderBtn {
-    background-color: #4caf50; /* أخضر مبهج */
+    background-color: #4caf50;
     color: white;
     border: none;
     border-radius: 25px;
@@ -64,8 +62,6 @@
     background-color: #45a049;
     transform: scale(1.05);
   }
-
-  /* Modal styles */
   .modal {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -104,7 +100,7 @@
     color: #2e8b57;
     font-size: 1.1rem;
   }
-  .modal-content input, .modal-content select {
+  .modal-content input {
     width: 100%;
     padding: 12px;
     margin-bottom: 20px;
@@ -112,10 +108,6 @@
     border: 2px solid #1e90ff;
     font-size: 1rem;
     box-sizing: border-box;
-    transition: border-color 0.3s ease;
-  }
-  .modal-content input:invalid {
-    border-color: #d9534f;
   }
   .modal-content button {
     background-color: #ffea00;
@@ -164,167 +156,108 @@
 <header>
   <h1>Hala Sandwich</h1>
   <p class="ingredients">مكونات الساندوتش: قطعة استربس - جبنة شيدر - كاتشب - مايونيز</p>
-  <img
-    src="https://www.thaqfny.com/wp-content/uploads/2020/12/for-web-4791-1.jpg"
-    alt="ساندوتش استربس"
-    class="sandwich-img"
-  />
+  <img src="https://www.thaqfny.com/wp-content/uploads/2020/12/for-web-4791-1.jpg" alt="ساندوتش استربس" class="sandwich-img" />
 </header>
 
-<button id="orderBtn" aria-haspopup="dialog" aria-controls="orderModal">اطلب الآن</button>
+<button id="orderBtn">اطلب الآن</button>
 
-<!-- Modal -->
-<div class="modal" id="orderModal" aria-hidden="true" role="dialog" aria-labelledby="modalTitle" aria-modal="true">
+<div class="modal" id="orderModal">
   <div class="modal-content">
-    <button class="close-btn" id="closeModal" aria-label="إغلاق">&times;</button>
-    <h2 id="modalTitle">اختر طريقة استلام الطلب</h2>
-
-    <select id="deliveryType" required aria-required="true" aria-describedby="priceInfo">
-      <option value="" disabled selected>اختر طريقة الاستلام</option>
-      <option value="pickup">هستلمه بنفسي من المكان</option>
-      <option value="delivery">التوصيل لمكانك (+5 جنيه)</option>
-    </select>
-
-    <form id="orderForm" style="display:none;" novalidate>
+    <button class="close-btn" id="closeModal">&times;</button>
+    <h2>تفاصيل الطلب</h2>
+    <form id="orderForm">
       <label for="name">الاسم الكامل:</label>
-      <input type="text" id="name" name="name" required placeholder="اكتب اسمك" autocomplete="name" />
+      <input type="text" id="name" name="name" required placeholder="اكتب اسمك" />
 
       <label for="phone">رقم التليفون:</label>
-      <input type="tel" id="phone" name="phone" required placeholder="مثلاً 01012345678" pattern="[0-9]{10,15}" autocomplete="tel" />
+      <input type="tel" id="phone" name="phone" required placeholder="مثلاً 01012345678" pattern="[0-9]{10,15}" />
+
+      <label for="address">العنوان:</label>
+      <input type="text" id="address" name="address" required placeholder="اكتب عنوانك" />
 
       <label for="quantity">عدد الساندوتشات:</label>
       <input type="number" id="quantity" name="quantity" min="1" value="1" required />
 
-      <div id="locationSection" style="display:none;">
-        <label for="location">موقعك الحالي:</label>
-        <input type="text" id="location" name="location" readonly placeholder="اضغط زر الموقع لاختيار مكانك" aria-readonly="true" />
-        <button type="button" id="getLocation" style="background:#1e90ff; color:#fff; border:none; border-radius:10px; padding:10px 15px; cursor:pointer; margin-bottom:20px;">مشاركة الموقع</button>
-      </div>
-
       <p class="price-info" id="priceInfo">سعر الساندوتش: 30 جنيه</p>
-
       <button type="submit" disabled>ارسال الطلب</button>
     </form>
   </div>
 </div>
 
+<!-- مكتبة EmailJS -->
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@2/dist/email.min.js"></script>
 <script>
+  (function(){
+    emailjs.init("rSoioGTMyih9YReWI"); // <-- هنا تحطي Public Key
+  })();
+
   const orderBtn = document.getElementById('orderBtn');
   const modal = document.getElementById('orderModal');
   const closeModalBtn = document.getElementById('closeModal');
-  const deliveryTypeSelect = document.getElementById('deliveryType');
   const orderForm = document.getElementById('orderForm');
   const submitBtn = orderForm.querySelector('button[type="submit"]');
-  const locationInput = document.getElementById('location');
-  const getLocationBtn = document.getElementById('getLocation');
-  const locationSection = document.getElementById('locationSection');
-  const priceInfo = document.getElementById('priceInfo');
-  const quantityInput = document.getElementById('quantity');
   const nameInput = document.getElementById('name');
   const phoneInput = document.getElementById('phone');
+  const addressInput = document.getElementById('address');
+  const quantityInput = document.getElementById('quantity');
+  const priceInfo = document.getElementById('priceInfo');
 
   const basePrice = 30;
-  const deliveryFee = 5;
 
   orderBtn.addEventListener('click', () => {
     modal.classList.add('active');
-    modal.setAttribute('aria-hidden', 'false');
-    deliveryTypeSelect.value = "";
-    orderForm.style.display = "none";
-    locationSection.style.display = "none";
-    submitBtn.disabled = true;
-    locationInput.value = "";
-    priceInfo.textContent = `سعر الساندوتش: ${basePrice} جنيه`;
     quantityInput.value = 1;
+    updatePrice();
     clearInputs();
   });
 
   closeModalBtn.addEventListener('click', () => {
     modal.classList.remove('active');
-    modal.setAttribute('aria-hidden', 'true');
     clearInputs();
   });
 
-  deliveryTypeSelect.addEventListener('change', () => {
-    orderForm.style.display = "block";
-    locationInput.value = "";
-    if (deliveryTypeSelect.value === "delivery") {
-      locationSection.style.display = "block";
-      priceInfo.textContent = `سعر الساندوتش: ${basePrice} جنيه + ${deliveryFee} جنيه توصيل`;
-    } else {
-      locationSection.style.display = "none";
-      priceInfo.textContent = `سعر الساندوتش: ${basePrice} جنيه`;
-    }
-    checkFormValidity();
-  });
-
-  getLocationBtn.addEventListener('click', () => {
-    if (!navigator.geolocation) {
-      alert('المتصفح لا يدعم خاصية الموقع.');
-      return;
-    }
-    getLocationBtn.textContent = "جاري الحصول على الموقع...";
-    getLocationBtn.disabled = true;
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-        locationInput.value = `خط العرض: ${latitude.toFixed(5)}, خط الطول: ${longitude.toFixed(5)}`;
-        getLocationBtn.textContent = "تم الحصول على الموقع";
-        checkFormValidity();
-      },
-      () => {
-        alert('تعذر الحصول على الموقع، يرجى السماح بالوصول للموقع.');
-        getLocationBtn.textContent = "مشاركة الموقع";
-        getLocationBtn.disabled = false;
-      }
-    );
-  });
-
-  function checkFormValidity() {
-    const deliveryType = deliveryTypeSelect.value;
-    const nameValid = nameInput.checkValidity();
-    const phoneValid = phoneInput.checkValidity();
-    const quantityValid = quantityInput.checkValidity();
-    let locationValid = true;
-
-    if (deliveryType === "delivery") {
-      locationValid = locationInput.value.trim() !== "";
-    }
-
-    submitBtn.disabled = !(nameValid && phoneValid && quantityValid && locationValid);
+  function updatePrice() {
+    priceInfo.textContent = `سعر الساندوتش: ${basePrice} جنيه`;
   }
 
-  [nameInput, phoneInput, quantityInput, locationInput].forEach(input => {
+  function checkFormValidity() {
+    submitBtn.disabled = !(nameInput.checkValidity() && phoneInput.checkValidity() && addressInput.checkValidity() && quantityInput.checkValidity());
+  }
+
+  [nameInput, phoneInput, addressInput, quantityInput].forEach(input => {
     input.addEventListener('input', checkFormValidity);
   });
 
-  orderForm.addEventListener('submit', e => {
+  orderForm.addEventListener('submit', function(e) {
     e.preventDefault();
 
     let totalPrice = basePrice * quantityInput.value;
-    if (deliveryTypeSelect.value === "delivery") {
-      totalPrice += deliveryFee * quantityInput.value;
-    }
 
-    alert(`شكراً لطلبك يا ${nameInput.value}!\nالعدد: ${quantityInput.value} ساندوتش\nالسعر الإجمالي: ${totalPrice} جنيه\nسيتم التواصل معك على الرقم: ${phoneInput.value}`);
+    // البيانات اللي هتتبعت لـ EmailJS
+    const templateParams = {
+      name: nameInput.value,
+      phone: phoneInput.value,
+      address: addressInput.value,
+      quantity: quantityInput.value,
+      total: totalPrice
+    };
 
-    modal.classList.remove('active');
-    modal.setAttribute('aria-hidden', 'true');
-    clearInputs();
+    emailjs.send("service_e42jb7q", "template_zcn68sq", templateParams)
+      .then(function(response) {
+         alert("تم إرسال طلبك بنجاح ✅");
+         modal.classList.remove('active');
+         clearInputs();
+      }, function(error) {
+         alert("حدث خطأ أثناء إرسال الطلب ❌");
+      });
   });
 
   function clearInputs() {
     nameInput.value = "";
     phoneInput.value = "";
+    addressInput.value = "";
     quantityInput.value = 1;
-    locationInput.value = "";
-    deliveryTypeSelect.value = "";
     submitBtn.disabled = true;
-    getLocationBtn.disabled = false;
-    getLocationBtn.textContent = "مشاركة الموقع";
-    orderForm.style.display = "none";
-    locationSection.style.display = "none";
   }
 </script>
 
